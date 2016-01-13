@@ -3,15 +3,37 @@ using System.Collections;
 
 public class Ball : MonoBehaviour {
 
+    private Rigidbody2D ballRB;
+    private Vector3 startPosition;
+
     public float speed = 30;
 
 	void Start () {
         // Initial velocity
-        GetComponent<Rigidbody2D>().velocity = Vector2.right * speed;	
-	}
+        ballRB = GetComponent<Rigidbody2D>();
+
+        startPosition = transform.position;
+
+        InitializeGame(Vector2.right);
+    }
+
+    void InitializeGame(Vector2 dir)
+    {
+        ballRB.velocity = dir * speed;
+        this.transform.position = startPosition;
+    }
 
     void OnCollisionEnter2D(Collision2D col)
     {
+        if (col.gameObject.name == "WallRight")
+        {
+            InitializeGame(Vector2.right);
+        }
+        else if (col.gameObject.name == "WallLeft")
+        {
+            InitializeGame(Vector2.left);
+        }
+
         // Note: 'col' holds the collision information. If the
         // Ball collided with a racket, then:
         //   col.gameObject is the racket
@@ -19,7 +41,7 @@ public class Ball : MonoBehaviour {
         //   col.collider is the racket's collider
 
         // Hit the left Racket?
-        if (col.gameObject.name == "RacketLeft")
+        else if (col.gameObject.name == "RacketLeft")
         {
             // Calculate hit Factor
             float y = hitFactor(transform.position,
@@ -30,7 +52,7 @@ public class Ball : MonoBehaviour {
             Vector2 dir = new Vector2(1, y).normalized;
 
             // Set Velocity with dir * speed
-            GetComponent<Rigidbody2D>().velocity = dir * speed;
+            ballRB.velocity = dir * speed;
         }
 
         // Hit the right Racket?
@@ -45,7 +67,7 @@ public class Ball : MonoBehaviour {
             Vector2 dir = new Vector2(-1, y).normalized;
 
             // Set Velocity with dir * speed
-            GetComponent<Rigidbody2D>().velocity = dir * speed;
+            ballRB.velocity = dir * speed;
         }
     }
 
